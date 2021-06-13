@@ -1,0 +1,3 @@
+[submodule "golemgrid-frontend"]
+	path = golemgrid-frontend
+	url = https://github.com/cryptobench/golemgrid-frontend/
