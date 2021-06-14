@@ -1,6 +1,7 @@
 version: '3.8'
 volumes:
   db_data: {}
+  db_data_manager: {}
   pgadmin:
 services:
   # traefik:
@@ -58,6 +59,38 @@ services:
         - 'traefik.docker.network=swarm-example'
         - 'traefik.http.middlewares.api_compress.compress=true'
         - 'traefik.http.routers.api.middlewares=api_compress'
+      replicas: 1
+      update_config:
+        failure_action: rollback
+        order: start-first
+      restart_policy:
+        condition: on-failure
+    networks:
+      - swarm-example
+  container-manager-api:
+    build:
+      context: .
+      dockerfile: compose/container-manager/Dockerfile
+    image: container-manager-api:latest
+    ports:
+      - '8003:8003'
+    depends_on:
+      - postgres
+    volumes:
+      - './golemgrid-container-manager/container-backend:/container-backend/'
+      - './wait-for-it.sh:/wait-for-it.sh'
+    env_file:
+      - ./.envs/.container-manager
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.http.routers.container-manager-api.rule=Host(`container-api.localhost`)'
+        - 'traefik.http.routers.container-manager-api.entrypoints=web'
+        - 'traefik.http.services.container-manager-api.loadbalancer.server.port=8003'
+        - 'traefik.http.routers.container-manager-api.service=api@docker'
+        - 'traefik.docker.network=swarm-example'
+        - 'traefik.http.middlewares.container-manager-api_compress.compress=true'
+        - 'traefik.http.routers.container-manager-api.middlewares=container-manager-api_compress'
       replicas: 1
       update_config:
         failure_action: rollback
@@ -142,6 +175,17 @@ services:
       - ./.envs/.db
     volumes:
       - 'db_data:/var/lib/postgresql/data'
+    networks:
+      - swarm-example
+  postgres-container-manager:
+    image: postgres
+    build:
+      context: .
+      dockerfile: compose/postgres/Dockerfile
+    env_file:
+      - ./.envs/.dbmanager
+    volumes:
+      - 'db_data_manager:/var/lib/postgresql/data'
     networks:
       - swarm-example
   # pgadmin:
