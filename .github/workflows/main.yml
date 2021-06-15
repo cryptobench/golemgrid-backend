@@ -35,4 +35,5 @@ jobs:
                 git submodule update --init --recursive
                 docker-compose -f docker-compose-prod.yml build
                 docker stack rm staginggolemgrid
+                sleep 10
                 docker stack deploy staginggolemgrid -c docker-compose-prod.yml
