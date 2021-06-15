@@ -35,7 +35,7 @@ services:
           - node.role == manager
     networks:
       - swarm-example
-  webserver:
+  api:
     build:
       context: .
       dockerfile: compose/django/Dockerfile
@@ -50,19 +50,52 @@ services:
     deploy:
       labels:
         - traefik.enable=true
-        - traefik.http.routers.webserver.rule=Host(`api.stats.golem.network`,`api.golemstats.com`)
-        - traefik.http.routers.webserver.entrypoints=web
-        - traefik.http.services.webserver.loadbalancer.server.port=8002
-        - traefik.http.routers.webserver.service=webserver@docker
+        - traefik.http.routers.api.rule=Host(`api.staging.golemgrid.com`)
+        - traefik.http.routers.api.entrypoints=web
+        - traefik.http.services.api.loadbalancer.server.port=8002
+        - traefik.http.routers.api.service=api@docker
         - traefik.docker.network=swarm-example
-        - traefik.http.routers.webserver.tls.certresolver=letsencryptresolver
-        - traefik.http.routers.webserver-web-secure.rule=Host(`api.stats.golem.network`,`api.golemstats.com`)
-        - traefik.http.routers.webserver-web-secure.tls=true
-        - traefik.http.routers.webserver-web-secure.entrypoints=web-secure
-        - traefik.http.middlewares.webserver_compress.compress=true
-        - traefik.http.routers.webserver-web-secure.middlewares=webserver_compress
-        - traefik.http.routers.webserver.middlewares=webserver_compress
+        - traefik.http.routers.api.tls.certresolver=letsencryptresolver
+        - traefik.http.routers.api-web-secure.rule=Host(`api.staging.golemgrid.com`)
+        - traefik.http.routers.api-web-secure.tls=true
+        - traefik.http.routers.api-web-secure.entrypoints=web-secure
+        - traefik.http.middlewares.api_compress.compress=true
+        - traefik.http.routers.api-web-secure.middlewares=api_compress
+        - traefik.http.routers.api.middlewares=api_compress
       replicas: 3
+      update_config:
+        failure_action: rollback
+        order: start-first
+      restart_policy:
+        condition: on-failure
+    networks:
+      - swarm-example
+  container-manager-api:
+    build:
+      context: .
+      dockerfile: compose/container-manager/Dockerfile
+    image: container-manager-api:latest
+    ports:
+      - '8003:8003'
+    depends_on:
+      - postgres
+    volumes:
+      - './golemgrid-container-manager/container-backend:/container-backend/'
+      - './wait-for-it.sh:/wait-for-it.sh'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    env_file:
+      - ./.envs/.container-manager
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.http.routers.container-manager-api.rule=Host(`container-api.localhost`)'
+        - 'traefik.http.routers.container-manager-api.entrypoints=web'
+        - 'traefik.http.services.container-manager-api.loadbalancer.server.port=8003'
+        - 'traefik.http.routers.container-manager-api.service=api@docker'
+        - 'traefik.docker.network=swarm-example'
+        - 'traefik.http.middlewares.container-manager-api_compress.compress=true'
+        - 'traefik.http.routers.container-manager-api.middlewares=container-manager-api_compress'
+      replicas: 1
       update_config:
         failure_action: rollback
         order: start-first
@@ -148,53 +181,50 @@ services:
       - 'db_data:/var/lib/postgresql/data'
     networks:
       - swarm-example
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   links:
-  #     - postgres
-  #   depends_on:
-  #     - postgres
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: 123@123.com
-  #     PGADMIN_DEFAULT_PASSWORD: 123
-  #   volumes:
-  #     - pgadmin:/var/lib/pgadmin
-  #   ports:
-  #     - '5050:80'
-  frontend:
+  postgres-container-manager:
+    image: postgres
     build:
       context: .
-      dockerfile: compose/frontend/Dockerfile
-    image: frontend_golemstats:latest
+      dockerfile: compose/postgres/Dockerfile
+    env_file:
+      - ./.envs/.dbmanager
     volumes:
-      - './golemstats-frontend:/app'
-      - '/app/node_modules'
-      - './nginx.conf:/etc/nginx/conf.d/default.conf'
-      - './golemstatssitemap.xml:/crawler/sitemap.xml'
-      - './robots.txt:/crawler/robots.txt'
-    deploy:
-      labels:
-        - traefik.enable=true
-        - traefik.http.routers.frontend.rule=Host(`stats.golem.network`,`golemstats.com`,`www.golemstats.com`)
-        - traefik.http.services.frontend.loadbalancer.server.port=80
-        - traefik.http.routers.frontend.service=frontend@docker
-        - traefik.http.routers.frontend.entrypoints=web
-        - traefik.docker.network=swarm-example
-        - traefik.http.routers.frontend.tls.certresolver=letsencryptresolver
-        - traefik.http.routers.frontend-web-secure.rule=Host(`stats.golem.network`,`golemstats.com`,`www.golemstats.com`)
-        - traefik.http.routers.frontend-web-secure.tls=true
-        - traefik.http.routers.frontend-web-secure.entrypoints=web-secure
-        - traefik.http.middlewares.frontend_compress.compress=true
-        - traefik.http.routers.frontend.middlewares=frontend_compress
-        - traefik.http.routers.frontend-web-secure.middlewares=frontend_compress
-      replicas: 3
-      update_config:
-        failure_action: rollback
-        order: start-first
-      restart_policy:
-        condition: on-failure
+      - 'db_data_manager:/var/lib/postgresql/data'
     networks:
-      - swarm-example
+  # frontend:
+  #   build:
+  #     context: .
+  #     dockerfile: compose/frontend/Dockerfile
+  #   image: frontend_golemstats:latest
+  #   volumes:
+  #     - './golemstats-frontend:/app'
+  #     - '/app/node_modules'
+  #     - './nginx.conf:/etc/nginx/conf.d/default.conf'
+  #     - './golemstatssitemap.xml:/crawler/sitemap.xml'
+  #     - './robots.txt:/crawler/robots.txt'
+  #   deploy:
+  #     labels:
+  #       - traefik.enable=true
+  #       - traefik.http.routers.frontend.rule=Host(`stats.golem.network`,`golemstats.com`,`www.golemstats.com`)
+  #       - traefik.http.services.frontend.loadbalancer.server.port=80
+  #       - traefik.http.routers.frontend.service=frontend@docker
+  #       - traefik.http.routers.frontend.entrypoints=web
+  #       - traefik.docker.network=swarm-example
+  #       - traefik.http.routers.frontend.tls.certresolver=letsencryptresolver
+  #       - traefik.http.routers.frontend-web-secure.rule=Host(`stats.golem.network`,`golemstats.com`,`www.golemstats.com`)
+  #       - traefik.http.routers.frontend-web-secure.tls=true
+  #       - traefik.http.routers.frontend-web-secure.entrypoints=web-secure
+  #       - traefik.http.middlewares.frontend_compress.compress=true
+  #       - traefik.http.routers.frontend.middlewares=frontend_compress
+  #       - traefik.http.routers.frontend-web-secure.middlewares=frontend_compress
+  #     replicas: 3
+  #     update_config:
+  #       failure_action: rollback
+  #       order: start-first
+  #     restart_policy:
+  #       condition: on-failure
+  #   networks:
+  #     - swarm-example
 networks:
   swarm-example:
     driver: overlay
