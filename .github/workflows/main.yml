@@ -26,10 +26,11 @@ jobs:
         with:
             host: ${{ secrets.STAGING_HOST }}
             username: ${{ secrets.STAGING_USER }}
-            key: ${{ secrets.STAGING_PASSWORD }}
+            key: ${{ secrets.STAGING_KEY }}
             port: ${{ secrets.STAGING_PORT }}
             script: |
                 cd golemgrid-backend
+                git checkout staging
                 git pull https://${{ secrets.STAGING_PAT }}@github.com/cryptobench/golemgrid-backend
                 git submodule update --init --recursive
                 docker-compose -f docker-compose-prod.yml build
