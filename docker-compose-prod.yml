@@ -191,6 +191,7 @@ services:
     volumes:
       - 'db_data_manager:/var/lib/postgresql/data'
     networks:
+      - swarm-example
   # frontend:
   #   build:
   #     context: .
