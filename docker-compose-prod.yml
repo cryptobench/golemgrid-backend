@@ -117,51 +117,51 @@ services:
         condition: on-failure
     networks:
       - swarm-example
-  celery:
-    build:
-      context: .
-      dockerfile: compose/celery/Dockerfile
-    image: celery_worker:latest
-    volumes:
-      - './api-backend:/api-backend/'
-      - './wait-for-it.sh:/wait-for-it.sh'
-      - './check_yagna.sh:/check_yagna.sh'
-    env_file:
-      - ./.envs/.django
-    depends_on:
-      - redis
-      - postgres
-      - webserver
-    healthcheck:
-      test: /check_yagna.sh || exit 1
-      interval: 15s
-      timeout: 5s
-      retries: 3
-      start_period: 15s
-    deploy:
-      replicas: 3
-      update_config:
-        failure_action: rollback
-        order: start-first
-      restart_policy:
-        condition: on-failure
-    networks:
-      - swarm-example
-  celery_beat:
-    build:
-      context: .
-      dockerfile: compose/celery/Dockerfile
-    image: celery_beat:latest
-    command: celery -A core beat -l INFO
-    volumes:
-      - './api-backend:/api-backend/'
-      - './wait-for-it.sh:/wait-for-it.sh'
-    env_file:
-      - ./.envs/.django
-    depends_on:
-      - redis
-      - postgres
-      - webserver
+  # celery:
+  #   build:
+  #     context: .
+  #     dockerfile: compose/celery/Dockerfile
+  #   image: celery_worker:latest
+  #   volumes:
+  #     - './api-backend:/api-backend/'
+  #     - './wait-for-it.sh:/wait-for-it.sh'
+  #     - './check_yagna.sh:/check_yagna.sh'
+  #   env_file:
+  #     - ./.envs/.django
+  #   depends_on:
+  #     - redis
+  #     - postgres
+  #     - webserver
+  #   healthcheck:
+  #     test: /check_yagna.sh || exit 1
+  #     interval: 15s
+  #     timeout: 5s
+  #     retries: 3
+  #     start_period: 15s
+  #   deploy:
+  #     replicas: 3
+  #     update_config:
+  #       failure_action: rollback
+  #       order: start-first
+  #     restart_policy:
+  #       condition: on-failure
+  #   networks:
+  #     - swarm-example
+  # celery_beat:
+  #   build:
+  #     context: .
+  #     dockerfile: compose/celery/Dockerfile
+  #   image: celery_beat:latest
+  #   command: celery -A core beat -l INFO
+  #   volumes:
+  #     - './api-backend:/api-backend/'
+  #     - './wait-for-it.sh:/wait-for-it.sh'
+  #   env_file:
+  #     - ./.envs/.django
+  #   depends_on:
+  #     - redis
+  #     - postgres
+  #     - webserver
     deploy:
       replicas: 1
       update_config:
