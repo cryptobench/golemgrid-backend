@@ -2,10 +2,10 @@ FROM node:lts-alpine as build
 WORKDIR /app
 RUN mkdir /crawler
 ENV PATH /app/node_modules/.bin:$PATH
-COPY ./golemstats-frontend/package.json /app/package.json
+COPY ./golemgrid-frontend/package.json /app/package.json
 RUN npm install --silent
 RUN npm install -g @vue/cli
-COPY ./golemstats-frontend/ /app
+COPY ./golemgrid-frontend/ /app
 RUN npm run build
 
 # production environment
