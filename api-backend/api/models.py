@@ -16,7 +16,7 @@ TASK_STATUS = (
 
 def blender_scene_path(instance, filename):
     generate_uuid = uuid.uuid4()
-    return 'user_{0}/{1}/{2}'.format(instance.user.id, str(generate_uuid), filename)
+    return '{0}/{1}'.format(str(generate_uuid), filename)
 
 
 class Blender(models.Model):
