@@ -14,17 +14,14 @@ TASK_STATUS = (
 )
 
 
+def blender_scene_path(instance, filename):
+    generate_uuid = uuid.uuid4()
+    return 'user_{0}/{1}/{2}'.format(instance.user.id, str(generate_uuid), filename)
+
+
 class Blender(models.Model):
-    scene_file = models.FileField(max_length=150)
-    resolution = ArrayField(ArrayField(models.CharField(max_length=10)))
-    compositing = models.BooleanField()
-    crops = ArrayField(models.CharField(max_length=30))
-    samples = models.PositiveIntegerField()
-    frames = ArrayField(models.CharField(max_length=30))
-    output_format = models.CharField(max_length=6)
-    resources_dir = models.FilePathField()
-    work_dir = models.FilePathField()
-    output_dir = models.FilePathField()
+    scene_file = models.FileField(upload_to=blender_scene_path)
+    task_args = models.JSONField(null=True)
     unique_id = models.UUIDField(
         default=uuid.uuid4, editable=False, unique=True)
     status = models.CharField(max_length=12,

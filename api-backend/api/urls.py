@@ -5,5 +5,5 @@ from . import views
 app_name = 'api'
 
 urlpatterns = [
-    #path('init/path', views.name),
+    path('submit/blender', views.create_blender_task),
 ]
