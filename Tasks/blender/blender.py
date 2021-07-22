@@ -52,7 +52,7 @@ async def main(params, subnet_tag, driver=None, network=None):
                 },
             )
             ctx.run("/golem/entrypoints/run-blender.sh")
-            output_file = f"output_{frame}.png"
+            output_file = f"/requestor/output/output_{frame}.png"
             ctx.download_file(f"/golem/output/out{frame:04d}.png", output_file)
             try:
                 # Set timeout for executing the script on the provider. Usually, 30 seconds
