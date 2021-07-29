@@ -21,7 +21,6 @@ examples_dir = pathlib.Path(__file__).resolve().parent.parent
 sys.path.append(str(examples_dir))
 
 
-
 async def main(params, subnet_tag, driver=None, network=None):
     package = await vm.repo(
         image_hash="9a3b5d67b0b27746283cb5f287c13eab1beaa12d92a9f536b747c7ae",
@@ -30,16 +29,17 @@ async def main(params, subnet_tag, driver=None, network=None):
     )
 
     async def worker(ctx: WorkContext, tasks):
-        script_dir = pathlib.Path(__file__).resolve().parent
-        scene_path = str(script_dir / "cubes.blend")
-        ctx.send_file(scene_path, "/golem/resource/scene.blend")
+        scene_path = params['scene_file']
+        scene_name = params['scene_name']
+        ctx.send_file(scene_path, f"/golem/resource/{scene_name}")
         async for task in tasks:
             frame = task.data
-            crops = [{"outfilebasename": "out", "borders_x": [0.0, 1.0], "borders_y": [0.0, 1.0]}]
+            crops = [{"outfilebasename": "out", "borders_x": [
+                0.0, 1.0], "borders_y": [0.0, 1.0]}]
             ctx.send_json(
                 "/golem/work/params.json",
                 {
-                    "scene_file": params['scene_file'],
+                    "scene_file": f"/golem/resource/{scene_name}",
                     "resolution": (params['resolution1'], params['resolution2']),
                     "use_compositing": params['use_compositing'],
                     "crops": crops,
@@ -52,7 +52,7 @@ async def main(params, subnet_tag, driver=None, network=None):
                 },
             )
             ctx.run("/golem/entrypoints/run-blender.sh")
-            output_file = f"output_{frame}.png"
+            output_file = f"/requestor/output/output_{frame}.png"
             ctx.download_file(f"/golem/output/out{frame:04d}.png", output_file)
             try:
                 # Set timeout for executing the script on the provider. Usually, 30 seconds
@@ -82,7 +82,8 @@ async def main(params, subnet_tag, driver=None, network=None):
     # reach the providers.
     min_timeout, max_timeout = 6, 29
 
-    timeout = timedelta(minutes=max(min(init_overhead + len(frames) * 2, max_timeout), min_timeout))
+    timeout = timedelta(minutes=max(
+        min(init_overhead + len(frames) * 2, max_timeout), min_timeout))
 
     async with Golem(
         budget=10.0,
@@ -125,10 +126,10 @@ if __name__ == "__main__":
     # This is only required when running on Windows with Python prior to 3.8:
     windows_event_loop_fix()
     parser = argparse.ArgumentParser()
-    parser.add_argument('-j','--jpath', type=str, required=True)
+    parser.add_argument('-j', '--jpath', type=str, required=True)
     args = parser.parse_args()
-    jsonParams = open(args.jpath,) 
-    # returns JSON object as 
+    jsonParams = open(args.jpath,)
+    # returns JSON object as
     # a dictionary
     params = json.load(jsonParams)
     enable_default_logger(
@@ -140,7 +141,8 @@ if __name__ == "__main__":
 
     loop = asyncio.get_event_loop()
     task = loop.create_task(
-        main(params,subnet_tag="devnet-beta.2", driver="zksync", network="rinkeby")
+        main(params, subnet_tag="devnet-beta.2",
+             driver="zksync", network="rinkeby")
     )
 
     try:
