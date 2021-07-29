@@ -16,7 +16,6 @@ def create_blender_task(request):
     if request.method == 'POST':
         scene = request.FILES['scene_file']
         construct_json = {
-            "scene_file": "/golem/resource/" + request.FILES['scene_file'].name,
             "resolution1": request.data["resolutionx"],
             "resolution2":  request.data["resolutiony"],
             "use_compositing": request.data["compositing"],
@@ -30,8 +29,10 @@ def create_blender_task(request):
         }
         e = Blender.objects.create(task_args=json.dumps(
             construct_json), scene_file=scene)
+        construct_json["scene_file"] = str(e.scene_file),
+        construct_json["scene_name"] = str(scene),
         url = "http://container-manager-api:8003/v1/start/blender"
         files = {'file': open(
             settings.MEDIA_ROOT + str(e.scene_file), 'rb')}
 
-        r = requests.post(url, files=files, data=construct_json)
+        r = requests.post(url, data=construct_json)

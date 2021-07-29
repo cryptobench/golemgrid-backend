@@ -6,4 +6,6 @@ echo "Starting Yagna"
 RUST_LOG=error MARKET_DB_CLEANUP_INTERVAL=10min /root/.local/bin/yagna service run > /dev/null 2>&1 &
 sleep 5
 key=$(/root/.local/bin/yagna app-key create requester)
+/root/.local/bin/yagna payment fund
+/root/.local/bin/yagna payment init --sender
 #export YAGNA_APPKEY="$(yagna app-key list --json | jq -r '.values | map(select(.[0] == "checker")) | .[0][1]')" && npm run ts:low -- --subnet-tag public-beta

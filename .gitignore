@@ -8,3 +8,4 @@ api-backend/static/rest_framework/*
 celerybeat-schedule.db
 golemstats-frontend/
 api-backend/var/media/*
+/uploads/*
