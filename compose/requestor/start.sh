@@ -8,4 +8,3 @@ sleep 5
 key=$(/root/.local/bin/yagna app-key create requester)
 /root/.local/bin/yagna payment fund
 /root/.local/bin/yagna payment init --sender
-#export YAGNA_APPKEY="$(yagna app-key list --json | jq -r '.values | map(select(.[0] == "checker")) | .[0][1]')" && npm run ts:low -- --subnet-tag public-beta

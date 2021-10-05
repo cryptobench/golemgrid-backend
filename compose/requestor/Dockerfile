@@ -33,7 +33,10 @@ RUN touch $HOME/.local/share/ya-installer/terms/testnet-01.tag
 RUN curl -sSf https://join.golem.network/as-requestor | bash - || echo "Downloaded Yagna Requestor"
 ENV PATH=${PATH}:/root/.local/bin/:/root/.local/
 COPY blender.py /requestor/blender.py
+COPY data.config /requestor/data.config
 COPY utils.py /requestor/utils.py
+COPY log.py /requestor/log.py
+COPY logutils.py /requestor/logutils.py
 EXPOSE 80
 
 # CMD will run when this dockerfile is running

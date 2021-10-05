@@ -13,7 +13,7 @@ from yapapi import (
     WorkContext,
     windows_event_loop_fix,
 )
-from yapapi.log import enable_default_logger
+from log import enable_default_logger
 from yapapi.payload import vm
 from yapapi.rest.activity import BatchTimeoutError
 
