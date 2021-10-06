@@ -46,6 +46,7 @@ services:
     volumes:
       - './api-backend:/api-backend/'
       - './wait-for-it.sh:/wait-for-it.sh'
+      - "./uploads:/api-backend/var/media"
     env_file:
       - ./.envs/.django
     deploy:
