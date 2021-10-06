@@ -228,3 +228,4 @@ services:
 networks:
   swarm-example:
     driver: overlay
+    attachable: true
