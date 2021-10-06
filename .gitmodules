@@ -1,8 +1,8 @@
-[submodule "golemgrid-frontend"]
-	path = golemgrid-frontend
-	url = https://github.com/cryptobench/golemgrid-frontend/
-	branch = master
 [submodule "golemgrid-container-manager"]
 	path = golemgrid-container-manager
 	url = https://github.com/cryptobench/golemgrid-container-manager
 	branch = master
+[submodule "golemgrid-frontend"]
+	path = golemgrid-frontend
+	url = https://github.com/cryptobench/golemgrid-frontend
+	branch = staging
