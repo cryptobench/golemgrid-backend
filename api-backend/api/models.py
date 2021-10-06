@@ -5,14 +5,6 @@ import uuid
 
 # Create your models here.
 
-TASK_STATUS = (
-    ("Not Started", "Not Started"),
-    ("Sent", "Sent"),
-    ("Computing", "March"),
-    ("Error", "Error"),
-    ("Finished", "Finished"),
-)
-
 
 def blender_scene_path(instance, filename):
     generate_uuid = uuid.uuid4()
@@ -24,6 +16,12 @@ class Blender(models.Model):
     task_args = models.JSONField(null=True)
     unique_id = models.UUIDField(
         default=uuid.uuid4, editable=False, unique=True)
-    status = models.CharField(max_length=12,
-                              choices=TASK_STATUS,
-                              default="Not Started")
+    status = models.CharField(max_length=12, default="Not Started")
+
+
+class Subtask(models.Model):
+    relationship = models.ForeignKey(
+        Blender, on_delete=models.CASCADE)
+    status = models.CharField(null=True, blank=True, max_length=12)
+    provider = models.CharField(null=True, blank=True, max_length=42)
+    task_data = models.IntegerField()

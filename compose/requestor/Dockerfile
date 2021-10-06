@@ -24,19 +24,15 @@ RUN apt install -y build-essential \
     jq
 
 # Update pip
-RUN pip3 install yapapi
-RUN pip3 install fastapi uvicorn python-multipart
-RUN git clone https://github.com/golemfactory/yapapi/ && cd yapapi && git checkout b0.6
+RUN pip3 install fastapi uvicorn python-multipart requests
 
 RUN mkdir -p $HOME/.local/share/ya-installer/terms
 RUN touch $HOME/.local/share/ya-installer/terms/testnet-01.tag
-RUN curl -sSf https://join.golem.network/as-requestor | bash - || echo "Downloaded Yagna Requestor"
+RUN curl -sSf https://join.golem.network/as-requestor | bash - || echo "Downloaded Yagna Requestor."
 ENV PATH=${PATH}:/root/.local/bin/:/root/.local/
 COPY blender.py /requestor/blender.py
 COPY data.config /requestor/data.config
 COPY utils.py /requestor/utils.py
-COPY log.py /requestor/log.py
-COPY logutils.py /requestor/logutils.py
 EXPOSE 80
 
 # CMD will run when this dockerfile is running

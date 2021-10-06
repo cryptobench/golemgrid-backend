@@ -8,3 +8,6 @@ sleep 5
 key=$(/root/.local/bin/yagna app-key create requester)
 /root/.local/bin/yagna payment fund
 /root/.local/bin/yagna payment init --sender
+echo "Installing custom yapapi"
+pip3 install git+https://github.com/cryptobench/yapapi.git@b0.7
+echo "Finished installing yapapi"
