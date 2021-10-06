@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.conf import settings
 from .models import Blender, Subtask
-from .serializers import SubtaskSerializer
+from .serializers import SubtaskSerializer, TaskSerializer
 import os
 from django.http import HttpResponse, JsonResponse
 import json
@@ -39,7 +39,8 @@ def create_blender_task(request):
             settings.MEDIA_ROOT + str(e.scene_file), 'rb')}
 
         r = requests.post(url, data=construct_json)
-        return HttpResponse('bam')
+        response = {'task_id': e.unique_id}
+        return JsonResponse(response)
 
 
 @api_view(['POST'])
@@ -68,10 +69,23 @@ def blender_subtask_logs(request):
 
 
 @api_view(['GET'])
-def display_blender_task(request):
+def retrieve_subtask_status(request, task_id):
     if request.method == 'GET':
-        data = Subtask.objects.all()
+        task = Blender.objects.get(unique_id=task_id)
+        data = Subtask.objects.filter(relationship=task)
         serializer = SubtaskSerializer(data, many=True)
+        print(serializer.data)
+        return JsonResponse(serializer.data, safe=False, json_dumps_params={'indent': 4})
+    else:
+        return HttpResponse(status=400)
+
+
+@api_view(['GET'])
+def retrieve_task_status(request, task_id):
+    if request.method == 'GET':
+        task = Blender.objects.get(unique_id=task_id)
+        serializer = TaskSerializer(task)
+        print(serializer.data)
         return JsonResponse(serializer.data, safe=False, json_dumps_params={'indent': 4})
     else:
         return HttpResponse(status=400)
