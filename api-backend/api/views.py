@@ -63,13 +63,13 @@ def blender_subtask_logs(request):
         task_data = request.data['task_data']
         provider = request.data['provider']
         provider_id = request.data['provider_id']
+        print(provider, task_data, status)
         db = Blender.objects.get(unique_id=task_id)
         obj, created = Subtask.objects.get_or_create(
             relationship=db, task_data=task_data, provider_id=provider_id)
         obj.status = status
+        obj.provider = provider
         obj.save()
-        subtask = Subtask.objects.create(
-            relationship=db, status=status, task_data=task_data, provider=provider, provider_id=provider_id)
     return HttpResponse('bam')
 
 
@@ -79,7 +79,6 @@ def retrieve_subtask_status(request, task_id):
         task = Blender.objects.get(unique_id=task_id)
         data = Subtask.objects.filter(relationship=task)
         serializer = SubtaskSerializer(data, many=True)
-        print(serializer.data)
         return JsonResponse(serializer.data, safe=False, json_dumps_params={'indent': 4})
     else:
         return HttpResponse(status=400)
@@ -90,7 +89,6 @@ def retrieve_task_status(request, task_id):
     if request.method == 'GET':
         task = Blender.objects.get(unique_id=task_id)
         serializer = TaskSerializer(task)
-        print(serializer.data)
         return JsonResponse(serializer.data, safe=False, json_dumps_params={'indent': 4})
     else:
         return HttpResponse(status=400)

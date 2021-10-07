@@ -121,8 +121,8 @@ async def main(params, subnet_tag, driver=None, network=None):
             f"{num_tasks} tasks computed, total time: {datetime.now() - start_time}"
         )
 
-        taskid = os.getenv("TASKID")
-        url = f"http://container-manager-api:8003/v1/container/ping/shutdown/{taskid}"
+        task_id = os.getenv("TASKID")
+        url = f"http://container-manager-api:8003/v1/container/ping/shutdown/{task_id}"
         requests.get(url)
 
 
