@@ -169,6 +169,57 @@ services:
         condition: on-failure
     networks:
       - swarm-example
+  celery_container_manager:
+    build:
+      context: .
+      dockerfile: compose/celery_container_manager/Dockerfile
+    image: celery_container_manager:latest
+    volumes:
+      - "./golemgrid-container-manager/container-backend:/container-backend/"
+      - "./uploads:/container-backend/var/media"
+      - "./wait-for-it.sh:/wait-for-it.sh"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    env_file:
+      - ./.envs/.container-manager
+    depends_on:
+      - redis
+      - postgres
+      - api
+    deploy:
+      replicas: 1
+      update_config:
+        failure_action: rollback
+        order: start-first
+      restart_policy:
+        condition: on-failure
+    networks:
+      - swarm-example
+  celery_beat_container_manager:
+    build:
+      context: .
+      dockerfile: compose/celery_container_manager/Dockerfile
+    image: celery_beat_container_manager:latest
+    command: celery -A core beat -l INFO
+    volumes:
+      - "./golemgrid-container-manager/container-backend:/container-backend/"
+      - "./uploads:/container-backend/var/media"
+      - "./wait-for-it.sh:/wait-for-it.sh"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    env_file:
+      - ./.envs/.container-manager
+    depends_on:
+      - redis
+      - postgres
+      - api
+    deploy:
+      replicas: 1
+      update_config:
+        failure_action: rollback
+        order: start-first
+      restart_policy:
+        condition: on-failure
+    networks:
+      - swarm-example
   postgres:
     image: postgres
     build:
@@ -203,7 +254,9 @@ services:
   #   volumes:
   #     - pgadmin:/var/lib/pgadmin
   #   ports:
-  #     - '5050:80'
+  #     - "5050:80"
+  #   networks:
+  #     - swarm-example
   # frontend:
   #   build:
   #     context: .

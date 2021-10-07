@@ -6,7 +6,8 @@ class SubtaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subtask
-        fields = ['relationship', 'provider', 'status', 'task_data']
+        fields = ['relationship', 'provider',
+                  'status', 'task_data', 'provider_id']
 
 
 class TaskSerializer(serializers.ModelSerializer):

@@ -16,6 +16,8 @@ from yapapi import (
 from yapapi.log import enable_default_logger
 from yapapi.payload import vm
 from yapapi.rest.activity import BatchTimeoutError
+import os
+import requests
 
 examples_dir = pathlib.Path(__file__).resolve().parent.parent
 sys.path.append(str(examples_dir))
@@ -118,6 +120,10 @@ async def main(params, subnet_tag, driver=None, network=None):
         print(
             f"{num_tasks} tasks computed, total time: {datetime.now() - start_time}"
         )
+
+        taskid = os.getenv("TASKID")
+        url = f"http://container-manager-api:8003/v1/container/ping/shutdown/{taskid}"
+        requests.get(url)
 
 
 if __name__ == "__main__":

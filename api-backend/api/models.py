@@ -24,4 +24,5 @@ class Subtask(models.Model):
         Blender, on_delete=models.CASCADE)
     status = models.CharField(null=True, blank=True, max_length=12)
     provider = models.CharField(null=True, blank=True, max_length=42)
+    provider_id = models.CharField(null=True, blank=True, max_length=42)
     task_data = models.IntegerField()

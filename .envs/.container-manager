@@ -1,4 +1,4 @@
-DB_HOST=postgres
+DB_HOST=postgres-container-manager
 DB_PORT=5432
 DB_PASSWORD=dbpass
 DB_USER=dbuser

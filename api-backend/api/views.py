@@ -62,9 +62,14 @@ def blender_subtask_logs(request):
         status = request.data['status']
         task_data = request.data['task_data']
         provider = request.data['provider']
+        provider_id = request.data['provider_id']
         db = Blender.objects.get(unique_id=task_id)
+        obj, created = Subtask.objects.get_or_create(
+            relationship=db, task_data=task_data, provider_id=provider_id)
+        obj.status = status
+        obj.save()
         subtask = Subtask.objects.create(
-            relationship=db, status=status, task_data=task_data, provider=provider)
+            relationship=db, status=status, task_data=task_data, provider=provider, provider_id=provider_id)
     return HttpResponse('bam')
 
 

@@ -5,6 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, File, Form, UploadFile
 import os
 import subprocess
+import requests
+
 app = FastAPI()
 
 
@@ -15,6 +17,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/ready", status_code=200)
+async def ping():
+    return
 
 
 @app.post("/files/")
@@ -36,3 +43,7 @@ async def receive_file(params: UploadFile = File(...)):
     proc = subprocess.Popen(command, shell=True)
     proc.wait()
     return {"stored_at": file_location}
+
+taskid = os.getenv("TASKID")
+url = f"http://container-manager-api:8003/v1/container/ping/ready/{taskid}"
+r = requests.get(url)
