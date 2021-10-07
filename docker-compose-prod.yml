@@ -132,12 +132,6 @@ services:
     depends_on:
       - redis
       - postgres
-    healthcheck:
-      test: /check_yagna.sh || exit 1
-      interval: 15s
-      timeout: 5s
-      retries: 3
-      start_period: 15s
     deploy:
       replicas: 3
       update_config:
