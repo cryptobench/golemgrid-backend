@@ -32,7 +32,14 @@ jobs:
                 cd golemgrid-backend
                 git checkout staging
                 git pull https://${{ secrets.STAGING_PAT }}@github.com/cryptobench/golemgrid-backend
-                git submodule update --init --recursive
+                cd golemgrid-frontend
+                git checkout staging
+                git pull
+                cd ..
+                cd golemgrid-container-manager
+                git checkout master
+                git pull
+                cd ..
                 docker-compose -f docker-compose-prod.yml build
                 docker stack rm staginggolemgrid
                 docker stack deploy staginggolemgrid -c docker-compose-prod.yml
