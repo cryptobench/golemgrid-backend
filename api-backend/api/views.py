@@ -43,6 +43,16 @@ def create_blender_task(request):
         return JsonResponse(response)
 
 
+@api_view(['GET'])
+def list_tasks(request):
+    if request.method == 'GET':
+        tasks = Blender.objects.all().order_by('-status')
+        serializer = TaskSerializer(tasks, many=True)
+        return JsonResponse(serializer.data, safe=False, json_dumps_params={'indent': 4})
+    else:
+        return HttpResponse(status=400)
+
+
 @api_view(['POST'])
 def blender_task_logs(request):
     if request.method == 'POST':
