@@ -41,5 +41,5 @@ jobs:
                 git pull
                 cd ..
                 docker-compose -f docker-compose-prod.yml build
-                docker stack rm staginggolemgrid
-                docker stack deploy staginggolemgrid -c docker-compose-prod.yml
+                docker stack rm golemgrid-backend
+                docker stack deploy golemgrid-backend -c docker-compose-prod.yml
