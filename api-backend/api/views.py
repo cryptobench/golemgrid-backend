@@ -77,7 +77,7 @@ def blender_subtask_logs(request):
 def retrieve_subtask_status(request, task_id):
     if request.method == 'GET':
         task = Blender.objects.get(unique_id=task_id)
-        data = Subtask.objects.filter(relationship=task)
+        data = Subtask.objects.filter(relationship=task).order_by('task_data')
         serializer = SubtaskSerializer(data, many=True)
         return JsonResponse(serializer.data, safe=False, json_dumps_params={'indent': 4})
     else:
