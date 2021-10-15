@@ -10,6 +10,7 @@ import json
 from rest_framework.parsers import MultiPartParser
 from rest_framework.decorators import parser_classes
 import requests
+from django.contrib.auth.decorators import login_required
 
 
 @api_view(['POST'])
@@ -30,7 +31,7 @@ def create_blender_task(request):
             "OUTPUT_DIR": "/golem/output",
         }
         e = Blender.objects.create(task_args=json.dumps(
-            construct_json), scene_file=scene)
+            construct_json), scene_file=scene, user=request.user)
         construct_json["scene_file"] = str(e.scene_file),
         construct_json["scene_name"] = str(scene),
         construct_json["task_id"] = str(e.unique_id)
@@ -46,7 +47,7 @@ def create_blender_task(request):
 @api_view(['GET'])
 def list_tasks(request):
     if request.method == 'GET':
-        tasks = Blender.objects.all().order_by('-id')
+        tasks = Blender.objects.filter(user=request.user).order_by('-id')
         serializer = TaskSerializer(tasks, many=True)
         return JsonResponse(serializer.data, safe=False, json_dumps_params={'indent': 4})
     else:

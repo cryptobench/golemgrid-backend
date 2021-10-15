@@ -1,7 +1,8 @@
 from django.db import models
-from django.utils import timezone
 from django.contrib.postgres.fields import ArrayField
 import uuid
+from django.conf import settings
+
 
 # Create your models here.
 
@@ -17,6 +18,10 @@ class Blender(models.Model):
     unique_id = models.UUIDField(
         default=uuid.uuid4, editable=False, unique=True)
     status = models.CharField(max_length=12, default="Not Started")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
 
 
 class Subtask(models.Model):
