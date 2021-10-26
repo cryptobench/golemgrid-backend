@@ -47,7 +47,7 @@ def create_blender_task(request):
 @api_view(['GET'])
 def list_tasks(request):
     if request.method == 'GET':
-        tasks = Blender.objects.all()
+        tasks = Blender.objects.filter(user=request.user).order_by('-id')
         serializer = TaskSerializer(tasks, many=True)
         return JsonResponse(serializer.data, safe=False, json_dumps_params={'indent': 4})
     else:
