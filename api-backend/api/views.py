@@ -2,7 +2,7 @@ from django.db.models.fields.related import RelatedField
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.conf import settings
-from .models import Blender, Subtask
+from .models import Blender, Subtask, BlenderResult
 from .serializers import SubtaskSerializer, TaskSerializer
 import os
 from django.http import HttpResponse, JsonResponse
@@ -82,6 +82,18 @@ def blender_subtask_logs(request):
         obj.provider = provider
         obj.save()
     return HttpResponse('bam')
+
+
+@api_view(['POST'])
+def blender_subtask_result(request):
+    if request.method == 'POST':
+        file = request.FILES['file']
+        task_id = request.data['id']
+        task = Blender.objects.get(unique_id=task_id)
+        resultdb = BlenderResult.objects.create(file=file, task=task)
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=400)
 
 
 @api_view(['GET'])

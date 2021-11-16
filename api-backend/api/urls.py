@@ -11,4 +11,5 @@ urlpatterns = [
     path('subtask/<task_id>', views.retrieve_subtask_status),
     path('task/<task_id>', views.retrieve_task_status),
     path('tasks/all', views.list_tasks),
+    path('blender/subtask/upload', views.blender_subtask_result),
 ]

@@ -24,6 +24,13 @@ class Blender(models.Model):
     )
 
 
+class BlenderResult(models.Model):
+    file = models.FileField(upload_to=blender_scene_path)
+    task = models.ForeignKey(Blender,
+                             on_delete=models.CASCADE,
+                             )
+
+
 class Subtask(models.Model):
     relationship = models.ForeignKey(
         Blender, on_delete=models.CASCADE)
