@@ -24,7 +24,7 @@ RUN apt install -y build-essential \
     jq
 
 # Update pip
-RUN pip3 install fastapi uvicorn python-multipart requests
+RUN pip3 install fastapi uvicorn python-multipart requests aiohttp
 
 RUN mkdir -p $HOME/.local/share/ya-installer/terms
 RUN touch $HOME/.local/share/ya-installer/terms/testnet-01.tag
@@ -32,7 +32,6 @@ RUN curl -sSf https://join.golem.network/as-requestor | bash - || echo "Download
 ENV PATH=${PATH}:/root/.local/bin/:/root/.local/
 COPY blender.py /requestor/blender.py
 COPY data.config /requestor/data.config
-COPY utils.py /requestor/utils.py
 EXPOSE 80
 
 # CMD will run when this dockerfile is running

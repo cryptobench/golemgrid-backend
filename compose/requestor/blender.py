@@ -18,12 +18,28 @@ from yapapi.payload import vm
 from yapapi.rest.activity import BatchTimeoutError
 import os
 import requests
+import aiohttp
+
+import colorama  # type: ignore
+
+
+TEXT_COLOR_RED = "\033[31;1m"
+TEXT_COLOR_GREEN = "\033[32;1m"
+TEXT_COLOR_YELLOW = "\033[33;1m"
+TEXT_COLOR_BLUE = "\033[34;1m"
+TEXT_COLOR_MAGENTA = "\033[35;1m"
+TEXT_COLOR_CYAN = "\033[36;1m"
+TEXT_COLOR_WHITE = "\033[37;1m"
+
+TEXT_COLOR_DEFAULT = "\033[0m"
+
+colorama.init()
 
 examples_dir = pathlib.Path(__file__).resolve().parent.parent
 sys.path.append(str(examples_dir))
 
 
-async def main(params, subnet_tag, driver=None, network=None):
+async def main(params, subnet_tag, payment_driver=None, payment_network=None):
     package = await vm.repo(
         image_hash="9a3b5d67b0b27746283cb5f287c13eab1beaa12d92a9f536b747c7ae",
         min_mem_gib=0.5,
@@ -33,13 +49,13 @@ async def main(params, subnet_tag, driver=None, network=None):
     async def worker(ctx: WorkContext, tasks):
         scene_path = params['scene_file']
         scene_name = params['scene_name']
-        ctx.send_file(scene_path, f"/golem/resource/{scene_name}")
+        script = ctx.new_script(timeout=timedelta(minutes=10))
+        script.upload_file(scene_path, f"/golem/resource/{scene_name}")
         async for task in tasks:
             frame = task.data
             crops = [{"outfilebasename": "out", "borders_x": [
                 0.0, 1.0], "borders_y": [0.0, 1.0]}]
-            ctx.send_json(
-                "/golem/work/params.json",
+            script.upload_json(
                 {
                     "scene_file": f"/golem/resource/{scene_name}",
                     "resolution": (params['resolution1'], params['resolution2']),
@@ -52,20 +68,27 @@ async def main(params, subnet_tag, driver=None, network=None):
                     "WORK_DIR": params['WORK_DIR'],
                     "OUTPUT_DIR": params['OUTPUT_DIR'],
                 },
+                "/golem/work/params.json",
             )
-            ctx.run("/golem/entrypoints/run-blender.sh")
+            script.run("/golem/entrypoints/run-blender.sh")
             output_file = f"/requestor/output/output_{frame}.png"
-            ctx.download_file(f"/golem/output/out{frame:04d}.png", output_file)
+            script.download_file(
+                f"/golem/output/out{frame:04d}.png", output_file)
             try:
                 # Set timeout for executing the script on the provider. Usually, 30 seconds
                 # should be more than enough for computing a single frame, however a provider
                 # may require more time for the first task if it needs to download a VM image
                 # first. Once downloaded, the VM image will be cached and other tasks that use
                 # that image will be computed faster.
-                yield ctx.commit(timeout=timedelta(minutes=10))
+                yield script
                 # TODO: Check if job results are valid
                 # and reject by: task.reject_task(reason = 'invalid file')
                 task.accept_result(result=output_file)
+                url = 'http://api:8002/v1/blender/subtask/upload'
+                with open(output_file, 'rb') as f:
+                    async with aiohttp.ClientSession() as session:
+                        async with session.post(url, data={'file': f, 'id': os.getenv("TASKID")}) as response:
+                            await response.text()
             except BatchTimeoutError:
                 print(
                     f"{TEXT_COLOR_RED}"
@@ -73,7 +96,7 @@ async def main(params, subnet_tag, driver=None, network=None):
                     f"{TEXT_COLOR_DEFAULT}"
                 )
                 raise
-
+            script = ctx.new_script(timeout=timedelta(minutes=1))
     # Iterator over the frame indices that we want to render
     frames: range = range(0, 60, 10)
     # Worst-case overhead, in minutes, for initialization (negotiation, file transfer etc.)
@@ -90,8 +113,8 @@ async def main(params, subnet_tag, driver=None, network=None):
     async with Golem(
         budget=10.0,
         subnet_tag=subnet_tag,
-        driver=driver,
-        network=network,
+        payment_driver=payment_driver,
+        payment_network=payment_network,
     ) as golem:
 
         print(
@@ -147,8 +170,8 @@ if __name__ == "__main__":
 
     loop = asyncio.get_event_loop()
     task = loop.create_task(
-        main(params, subnet_tag="devnet-beta.2",
-             driver="zksync", network="rinkeby")
+        main(params, subnet_tag="devnet-beta",
+             payment_driver="zksync", payment_network="rinkeby")
     )
 
     try:
