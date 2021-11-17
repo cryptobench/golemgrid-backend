@@ -27,7 +27,8 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', 'api', 'api:8002', 'api.staging.golemgrid.com']
+ALLOWED_HOSTS = ['localhost', 'api', 'api:8002',
+                 'api.staging.golemgrid.com', 'api.localhost']
 
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 

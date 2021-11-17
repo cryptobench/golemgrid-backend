@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.conf import settings
 from .models import Blender, Subtask, BlenderResult
-from .serializers import SubtaskSerializer, TaskSerializer
+from .serializers import SubtaskSerializer, TaskSerializer, ResultSerializer
 import os
 from django.http import HttpResponse, JsonResponse
 import json
@@ -50,6 +50,20 @@ def list_tasks(request):
         tasks = Blender.objects.filter(user=request.user).order_by('-id')
         serializer = TaskSerializer(tasks, many=True)
         return JsonResponse(serializer.data, safe=False, json_dumps_params={'indent': 4})
+    else:
+        return HttpResponse(status=400)
+
+
+@api_view(['GET'])
+def list_results(request, task_id):
+    if request.method == 'GET':
+        task = Blender.objects.get(unique_id=task_id)
+        if task.user == request.user:
+            results = BlenderResult.objects.filter(task=task).order_by('-id')
+            serializer = ResultSerializer(results, many=True)
+            return JsonResponse(serializer.data, safe=False, json_dumps_params={'indent': 4})
+        else:
+            return HttpResponse(status=404)
     else:
         return HttpResponse(status=400)
 
