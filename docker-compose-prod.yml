@@ -278,11 +278,18 @@ services:
     deploy:
       labels:
         - traefik.enable=true
-        - traefik.http.routers.nginx-static.rule=Host(`static.staging.golemgrid.com`)
+        - traefik.http.routers.nginx-static.rule=Host(`static.staging.golemgrid.com`,`www.static.staging.golemgrid.com`)
         - traefik.http.services.nginx-static.loadbalancer.server.port=80
         - traefik.http.routers.nginx-static.service=nginx-static@docker
         - traefik.http.routers.nginx-static.entrypoints=web
         - traefik.docker.network=swarm-example
+        - traefik.http.routers.nginx-static.tls.certresolver=letsencryptresolver
+        - traefik.http.routers.nginx-static-web-secure.rule=Host(`static.staging.golemgrid.com`,`www.static.staging.golemgrid.com`)
+        - traefik.http.routers.nginx-static-web-secure.tls=true
+        - traefik.http.routers.nginx-static-web-secure.entrypoints=web-secure
+        - traefik.http.middlewares.nginx-static_compress.compress=true
+        - traefik.http.routers.nginx-static.middlewares=nginx-static_compress
+        - traefik.http.routers.nginx-static-web-secure.middlewares=nginx-static_compress
       replicas: 1
       update_config:
         failure_action: rollback
