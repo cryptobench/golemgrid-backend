@@ -32,6 +32,7 @@ RUN curl -sSf https://join.golem.network/as-requestor | bash - || echo "Download
 ENV PATH=${PATH}:/root/.local/bin/:/root/.local/
 COPY blender.py /requestor/blender.py
 COPY data.config /requestor/data.config
+COPY utils.py /requestor/utils.py
 EXPOSE 80
 
 # CMD will run when this dockerfile is running
