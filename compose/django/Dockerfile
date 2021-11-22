@@ -10,7 +10,7 @@ RUN mkdir /api-backend
 RUN mkdir /api-backend/static
 
 # Creating Work Directory
-WORKDIR /api-backend
+WORKDIR /
 
 # Adding mandatory packages to docker
 RUN apk update && apk add --no-cache \
@@ -42,6 +42,9 @@ RUN pip install --no-cache-dir -r /scripts/requirements.pip
 RUN apk del build-deps && \
     find -type d -name __pycache__ -prune -exec rm -rf {} \; && \
     rm -rf ~/.cache/pip
+
+COPY ./wait-for-it.sh /wait-for-it.sh
+ADD api-backend /
 
 # CMD will run when this dockerfile is running
 CMD ["sh", "-c",  "/wait-for-it.sh postgres:5432 -- python manage.py makemigrations; python manage.py migrate; python manage.py collectstatic --no-input; daphne -u /tmp/daphne.sock -b 0.0.0.0 -p 8002 core.asgi:application"]

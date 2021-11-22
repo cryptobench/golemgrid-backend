@@ -9,3 +9,4 @@ celerybeat-schedule.db
 golemstats-frontend/
 api-backend/var/media/*
 /uploads/*
+/compose/django/api-backend/*

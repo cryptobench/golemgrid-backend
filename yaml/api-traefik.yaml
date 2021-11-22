@@ -1,0 +1,14 @@
+# dashboard.yaml
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: api-ingress
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`api.localhost`)
+      kind: Rule
+      services:
+        - name: api
+          port: 8002
