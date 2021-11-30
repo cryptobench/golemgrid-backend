@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api-backend
+  name: api-backend-celery-beat
   labels:
-    app: api
+    app: api-celery-beat
 spec:
-    replicas: 2
+    replicas: 1
     selector:
       matchLabels:
-        app: api
+        app: api-celery-beat
     template:
       metadata:
         labels:
-          app: api
+          app: api-celery-beat
       spec:
         containers:
-          - image: phillipjensen/golem-stats-backend:032a924217a5a70631f54aa27356134dd8234933
-            name: api
+          - image: phillipjensen/golem-stats-backend-celery-beat:032a924217a5a70631f54aa27356134dd8234933
+            name: api-celery-beat
             envFrom:
             - secretRef:
                 name: api-secrets
@@ -29,13 +29,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: api
+  name: api-celery-beat
   labels:
-    app: api
+    app: api-celery-beat
 spec:
   ports:
     - protocol: TCP
       port: 8002
       targetPort: http
   selector:
-    app: api
+    app: api-celery-beat

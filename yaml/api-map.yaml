@@ -10,3 +10,4 @@ data:
   DATABASE: "golemgrid"
   DJANGO_SECRET: "39fp%%sz7m(z3s0bbbx*tndah#8r8)wq_mcx*7@wrsr(o12z7r"
   DEBUG: "True"
+  LOCAL_TESTING_ADDR: "192.168.1.98"
