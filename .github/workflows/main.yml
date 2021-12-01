@@ -28,10 +28,10 @@ jobs:
       - name: SSH deploy
         uses: appleboy/ssh-action@master
         with:
-            host: ${{ secrets.HOST }}
-            username: ${{ secrets.USERNAME }}
-            key: ${{ secrets.KEY }}
-            port: ${{ secrets.PORT }}
+            host: ${{ secrets.STAGING_HOST }}
+            username: ${{ secrets.STAGING_USER }}
+            key: ${{ secrets.STAGING_KEY }}
+            port: ${{ secrets.STAGING_PORT }}
             script: |
                 docker service update --force --image phillipjensen/golemgrid-backend:${{ github.sha }} golemgrid-backend_api
                 docker service update --force --image phillipjensen/golemgrid-backend-celery:${{ github.sha }} golemgrid-backend_celery
