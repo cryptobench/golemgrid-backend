@@ -1,7 +1,0 @@
-DB_HOST=postgres
-DB_PORT=5432
-DB_PASSWORD=dbpass
-DB_USER=dbuser
-DATABASE=golemgrid
-DJANGO_SECRET=39fp%%sz7m(z3s0bbbx*tndah#8r8)wq_mcx*7@wrsr(o12z7r
-DEBUG=True
