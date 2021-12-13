@@ -12,6 +12,7 @@ IMG_CELERY_BEAT    := golemgrid-backend-celery-beat:${GITHUB_SHA}
 LATEST_CELERY_BEAT := ${CELERY_BEAT}:${GITHUB_SHA}
  
 build:
+	@docker buildx create --use	
 	@docker buildx build --platform=linux/arm64,linux/amd64 --push -t ${LATEST_DJANGO} -f ./dockerfiles/Django .
 	@docker buildx build --platform=linux/arm64,linux/amd64 --push -t ${LATEST_CELERY} -f ./dockerfiles/Celery .
 	@docker buildx build --platform=linux/arm64,linux/amd64 --push -t ${LATEST_CELERY_BEAT} -f ./dockerfiles/Beat .
