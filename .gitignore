@@ -7,3 +7,7 @@ api-backend/static/admin/*
 api-backend/static/rest_framework/*
 celerybeat-schedule.db
 golemstats-frontend/
+api-backend/var/media/*
+/uploads/*
+/compose/django/api-backend/*
+/golemgrid-container-manager/*
