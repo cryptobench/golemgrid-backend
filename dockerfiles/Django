@@ -10,7 +10,7 @@ RUN mkdir /api-backend
 RUN mkdir /api-backend/static
 
 # Creating Work Directory
-WORKDIR /
+WORKDIR /api-backend
 
 # Adding mandatory packages to docker
 RUN apk update && apk add --no-cache \
