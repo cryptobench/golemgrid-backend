@@ -38,5 +38,3 @@ jobs:
                 docker service update --force --image phillipjensen/golemgrid-backend:${{ github.sha }} golemgrid-backend_api
                 docker service update --force --image phillipjensen/golemgrid-backend-celery:${{ github.sha }} golemgrid-backend_celery
                 docker service update --force --image phillipjensen/golemgrid-backend-celery-beat:${{ github.sha }} golemgrid-backend_celery_beat
-  
-  
