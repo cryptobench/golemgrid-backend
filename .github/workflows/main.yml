@@ -27,9 +27,6 @@ jobs:
       - name: Build Containers
         run: make build
 
-      - name: Push to Dockerhub
-        run: make push
-
       - name: SSH deploy
         uses: appleboy/ssh-action@master
         with:
