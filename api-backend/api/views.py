@@ -25,9 +25,6 @@ def create_blender_task(request):
         construct_json["scene_name"] = str(scene),
         construct_json["task_id"] = str(e.unique_id)
         url = "http://container-manager-api:8003/v1/start/blender"
-        files = {'file': open(
-            settings.MEDIA_ROOT + str(e.scene_file), 'rb')}
-
         r = requests.post(url, data=construct_json)
         response = {'task_id': e.unique_id}
         return JsonResponse(response)
