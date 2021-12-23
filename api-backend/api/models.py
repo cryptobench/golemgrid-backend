@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 import uuid
 from django.conf import settings
+from pprint import pprint
 
 
 # Create your models here.
@@ -10,6 +11,12 @@ from django.conf import settings
 def blender_scene_path(instance, filename):
     generate_uuid = uuid.uuid4()
     return '{0}/{1}'.format(str(generate_uuid), filename)
+
+
+def blender_output_path(instance, filename):
+    obj = Blender.objects.get(id=instance.task_id)
+    print(obj)
+    return '{0}/{1}'.format(obj.unique_id, filename)
 
 
 class Blender(models.Model):
@@ -25,7 +32,7 @@ class Blender(models.Model):
 
 
 class BlenderResult(models.Model):
-    file = models.FileField(upload_to=blender_scene_path)
+    file = models.FileField(upload_to=blender_output_path)
     task = models.ForeignKey(Blender,
                              on_delete=models.CASCADE,
                              )
