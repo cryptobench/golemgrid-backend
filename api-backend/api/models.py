@@ -44,4 +44,5 @@ class Subtask(models.Model):
     status = models.CharField(null=True, blank=True, max_length=12)
     provider = models.CharField(null=True, blank=True, max_length=42)
     provider_id = models.CharField(null=True, blank=True, max_length=42)
+    computation_time = models.CharField(null=True, blank=True, max_length=20)
     task_data = models.IntegerField()

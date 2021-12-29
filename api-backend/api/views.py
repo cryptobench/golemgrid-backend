@@ -74,10 +74,12 @@ def blender_subtask_logs(request):
         task_data = request.data['task_data']
         provider = request.data['provider']
         provider_id = request.data['provider_id']
-        print(provider, task_data, status)
         db = Blender.objects.get(unique_id=task_id)
         obj, created = Subtask.objects.get_or_create(
             relationship=db, task_data=task_data, provider_id=provider_id)
+        if "time" in request.data:
+            time = request.data['time']
+            obj.computation_time = time
         obj.status = status
         obj.provider = provider
         obj.save()
@@ -101,6 +103,10 @@ def retrieve_subtask_status(request, task_id):
     if request.method == 'GET':
         task = Blender.objects.get(unique_id=task_id)
         data = Subtask.objects.filter(relationship=task).order_by('task_data')
+        durations = []
+        for obj in data:
+            durations.append(obj.computation_time)
+        print(durations)
         serializer = SubtaskSerializer(data, many=True)
         return JsonResponse(serializer.data, safe=False, json_dumps_params={'indent': 4})
     else:
