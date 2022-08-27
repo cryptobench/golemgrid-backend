@@ -19,11 +19,19 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from dj_rest_auth.views import PasswordResetView, PasswordResetConfirmView
+
+from auth import jwt
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('v1/', include('api.urls')),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/', jwt.MyTokenObtainPairView.as_view(),
+         name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
     path('auth/', include('auth.urls')),
+    path('reset-password/confirm/<uidb64>/<token>/',
+         PasswordResetConfirmView.as_view(),
+         name='password_reset_confirm'),
 ]

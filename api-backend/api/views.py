@@ -20,7 +20,7 @@ def create_blender_task(request):
         scene = request.FILES['scene_file']
         construct_json = {}
         e = Blender.objects.create(task_args=json.dumps(
-            construct_json), scene_file=scene, user=request.user)
+            construct_json), scene_file=scene, user=request.user, name=request.POST.get('name'))
         construct_json["scene_file"] = str(e.scene_file),
         construct_json["scene_name"] = str(scene),
         construct_json["task_id"] = str(e.unique_id)

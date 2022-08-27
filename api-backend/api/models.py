@@ -1,8 +1,6 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
 import uuid
 from django.conf import settings
-from pprint import pprint
 
 
 # Create your models here.
@@ -20,6 +18,7 @@ def blender_output_path(instance, filename):
 
 
 class Blender(models.Model):
+    name = models.CharField(max_length=100)
     scene_file = models.FileField(upload_to=blender_scene_path)
     task_args = models.JSONField(null=True)
     unique_id = models.UUIDField(

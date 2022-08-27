@@ -14,7 +14,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Blender
-        fields = ['unique_id', 'status', 'task_args', ]
+        fields = ['unique_id', 'status', 'task_args', 'name']
 
 
 class ResultSerializer(serializers.ModelSerializer):
