@@ -121,3 +121,15 @@ def retrieve_task_status(request, task_id):
         return JsonResponse(serializer.data, safe=False, json_dumps_params={'indent': 4})
     else:
         return HttpResponse(status=400)
+
+
+@api_view(['POST'])
+def save_blender_task_args(request):
+    if request.method == 'POST':
+        task = Blender.objects.get(unique_id=request.POST.get('id'))
+        data = requests.POST.get('data')
+        task.task_args = data
+        task.save()
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=400)
